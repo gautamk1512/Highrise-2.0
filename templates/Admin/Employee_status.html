@@ -1,0 +1,232 @@
+{% extends 'Admin/base.html' %}
+{% block content %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">Employee Status</h4>
+
+        </div>
+        <div class="page-title-right">
+            <button type="button" class="btn btn-info"  data-bs-toggle="modal" data-bs-target="#addemp">
+                Add Employee
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-body">               
+                <div class="live-preview">
+                    <div class="table-responsive table-card">
+                        <table class="table align-middle table-nowrap mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col" class="text-center">S.No.</th>
+                                    <th scope="col" class="text-center">Name</th>
+                                    <th scope="col" class="text-center">Status</th>
+                                    <th scope="col" class="text-center">Team</th>
+                                    <th scope="col" class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                {% for i in employee %}
+                                <tr>
+                                    <td class="text-center">{{ forloop.counter }}</td>
+                                    <td class="text-center">{{ i.member_name }}</td>
+                                    <td class="text-center">
+                                        {% if i.status == 0 %} Not Active {% else %} Active {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if i.team_id == 1 %}
+                                            eMarketing
+                                        {% elif i.team_id == 2 %}
+                                            Local Corporate
+                                        {% elif i.team_id == 3 %}
+                                            Sage Golden Spring
+                                        {% elif i.team_id == 4 %}
+                                            Sage Milestone
+                                        {% elif i.team_id == 5 %}
+                                            Sage Nirvana
+                                        {% elif i.team_id == 6 %}
+                                            Back Office
+                                        {% elif i.team_id == 7 %}
+                                            Sage Pearl
+                                        {% elif i.team_id == 8 %}
+                                            Sage Sun Villas
+                                        {% elif i.team_id == 9 %}
+                                            Sage Information Center
+                                        {% else %}
+                                            Unknown team
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-info"
+                                                data-bs-toggle="modal" data-bs-target="#myModal"
+                                                data-user-id="{{ i.id }}" data-status="{{ i.status }}">
+                                            Change Status
+                                        </button>
+                                        <button type="button" class="btn btn-success"
+                                                data-bs-toggle="modal" data-bs-target="#TeamChange"
+                                                data-u-id="{{ i.id }}" data-team="{{ i.team_id }}">
+                                            Change Team
+                                        </button>
+
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>                
+            </div><!-- end card-body -->
+        </div><!-- end card -->
+    </div><!-- end col -->
+</div>
+
+<!-- Status Modals -->
+<div id="myModal" class="modal fade" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <form method='POST' action="{% url 'Employee_status' %}">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myModalLabel">Change Employee Status</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"> </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="user_id" id="user_id">
+                    <div class="col-md-10">                  
+                        <select class="form-control" name="emp_status" id="emp_status">
+                            <option value='1'>Active</option>
+                            <option value='0'>Not Active</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Update Status</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </form>
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- Change Team Modals -->
+<div id="TeamChange" class="modal fade" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <form method='POST' action="{% url 'Employee_status' %}">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myModalLabel">Change Employee Team</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"> </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="u_id" id="u_id">
+                    <div class="col-md-10">                  
+                        <select class="form-control" name="team_id" id="team_id">
+                            <option>Select User Type</option>
+                            {% for i in team %}
+                                <option value="{{ i.id}}">{{ i.T_name}}</option>
+                            {% endfor %}   
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Update Status</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </form>
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+<!-- Add Employee Modals -->
+<div id="addemp" class="modal fade" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <form method='POST' action="{% url 'Employee_status' %}">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addLabel">Add New Employee</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"> </button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="Emp_name" class="form-label">Employee Full Name</label>
+                        <input type="text" class="form-control" id="Emp_name" name='Emp_name' placeholder="Enter Employee Full Name">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">email</label>
+                        <input type="email" class="form-control" id="email" name='email' placeholder="Enter email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Select Team</label>
+                        <select class="form-select mb-3" aria-label="Default select example" name='team'>
+                            <option>Select User Type</option>
+                            {% for i in team %}
+                                <option value="{{ i.id}}">{{ i.T_name}}</option>
+                            {% endfor %}                                  
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ph_number" class="form-label">Phone Number</label>
+                        <input type="text" class="form-control" id="ph_number" name='ph_number' placeholder="Enter Phone">
+                    </div>
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name='username' placeholder="Enter username for login">
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name='password' placeholder="Enter Password for login">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Update Status</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </form>
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script>
+  
+        document.addEventListener('DOMContentLoaded', function() {
+            var modal = document.getElementById('myModal');
+            modal.addEventListener('show.bs.modal', function(event) {
+                var button = event.relatedTarget;
+                var userId = button.getAttribute('data-user-id');
+                var status = button.getAttribute('data-status');
+                var modalUserIdInput = document.getElementById('user_id');
+                var modalStatusSelect = document.getElementById('emp_status');
+               
+                modalUserIdInput.value = userId; 
+                modalStatusSelect.value = status;  
+            });
+    
+            var teamChangeModal = document.getElementById('TeamChange');
+            teamChangeModal.addEventListener('show.bs.modal', function(event) {
+                var button = event.relatedTarget;
+                var uId = button.getAttribute('data-u-id');
+                var teamId = button.getAttribute('data-team');
+                var modalUIdInput = document.getElementById('u_id');
+                var modalTeamSelect = document.getElementById('team_id');
+               
+                modalUIdInput.value = uId; 
+                modalTeamSelect.value = teamId;  
+            });
+        });
+    
+    
+</script>
+{% endblock %}
+
+

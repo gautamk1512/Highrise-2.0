@@ -1,0 +1,129 @@
+document.getElementById("memberSelect").addEventListener("change", function(event){
+    var memberName = event.target.options[event.target.selectedIndex].text;
+    var startDate = document.getElementById("StartDate").value;
+    var endDate = document.getElementById("EndDate").value;
+    if (!startDate && !endDate) {
+        console.log('====', memberName)
+        if (memberName !== 'Select Member') {                
+            clearLeadFunnelTable();                 
+            var queryString = "?member=" + memberName ;
+            //console.log('================', queryString)
+            DPR(queryString);
+        }                        
+        else {
+            location.reload();
+        }
+    }
+    else {
+       if (startDate && endDate && memberName !== 'Select Member' ) {
+            var queryString = '?start_date=' + startDate + '&end_date=' + endDate + '&member=' + memberName  ;
+            clearLeadFunnelTable();
+            //console.log('================', queryString)
+            DPR(queryString);
+        }
+        else  {
+            location.reload();
+        }
+    }
+});
+document.getElementById("StartDate").addEventListener("change", function(event){
+    date();
+});
+document.getElementById("EndDate").addEventListener("change", function(event){
+    date();
+});
+function date(){
+    var startDate = document.getElementById("StartDate").value;
+    var endDate = document.getElementById("EndDate").value;
+    var selectedTeamId = document.getElementById('teamSelect').value;
+
+    if (startDate && endDate && selectedTeamId !== 'Select Team') {
+        var queryString = '?start_date=' + startDate + '&end_date=' + endDate + '&team=' + selectedTeamId  ;
+        clearLeadFunnelTable();
+       // console.log('================', queryString)
+        DPR(queryString);
+    }
+    else if (startDate && endDate) {
+        var queryString = '?start_date=' + startDate + '&end_date=' + endDate;
+        clearLeadFunnelTable();
+      //  console.log('================', queryString)
+        DPR(queryString);
+    }        
+}
+document.getElementById("teamSelect").addEventListener("change", function(event){
+    var memberName = document.getElementById("memberSelect").options[document.getElementById("memberSelect").selectedIndex].text;
+    var startDate = document.getElementById("StartDate").value;
+    var endDate = document.getElementById("EndDate").value;
+    var selectedTeamId = event.target.value;
+    
+    if (!startDate && !endDate) {
+        //console.log('====', selectedTeamId)
+         if(selectedTeamId !== 'Select Team'){
+            clearLeadFunnelTable();
+            var queryString = '?team=' + selectedTeamId ;
+            //console.log('================', queryString)
+            DPR(queryString);
+        }            
+        else {
+            location.reload();
+        }
+    }
+    else {
+        if (startDate && endDate && selectedTeamId !== 'Select Team') {
+            var queryString = '?start_date=' + startDate + '&end_date=' + endDate + '&team=' + selectedTeamId  ;
+            clearLeadFunnelTable();
+            //console.log('================', queryString)
+            DPR(queryString);
+        }
+        else {
+            location.reload();
+        }
+    }
+});
+
+function DPR(queryString) {         
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "{% url 'DPR' %}" + queryString, true);
+    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            var responseData = JSON.parse(xhr.responseText);
+            var mainData = responseData.leadfunnelData;             
+            var tableBody = document.getElementById("leadfunnel-table-body");    
+            Table(mainData);
+            displayTotalSum();
+        }
+        
+    };
+    xhr.send();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var teams = document.querySelectorAll('.card');
+    teams.forEach(function(team) {
+        var tableBody = team.querySelector('tbody');
+        var totalRow = document.createElement('tr');
+        totalRow.innerHTML = `<td colspan='2'>Grand Total</td>`;
+        var totalBookings = 0;
+        var totalHomeVisits = 0;
+        var totalCorpVisits = 0;
+        var totalCustomerFW = 0;
+        var totalNewLeads = 0;
+        var totalSmFW = 0;
+        var rows = tableBody.querySelectorAll('tr');
+        rows.forEach(function(row) {
+            var cells = row.querySelectorAll('td');
+            if (cells.length > 1) {
+                totalBookings += parseInt(cells[2].textContent);
+                totalHomeVisits += parseInt(cells[3].textContent);
+                totalCorpVisits += parseInt(cells[4].textContent);
+                totalCustomerFW += parseInt(cells[5].textContent);
+                totalNewLeads += parseInt(cells[6].textContent);
+                totalSmFW += parseInt(cells[7].textContent);
+            }
+        });
+
+        totalRow.innerHTML += `<td class='text-center'>${totalBookings}</td><td class='text-center'>${totalHomeVisits}</td><td class='text-center'>${totalCorpVisits}</td><td class='text-center'>${totalCustomerFW}</td><td class='text-center'>${totalNewLeads}</td><tdclass='text-center'>${totalSmFW}</td>`;
+        tableBody.appendChild(totalRow);
+    });
+});
